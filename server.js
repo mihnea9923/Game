@@ -5,7 +5,6 @@ const socketio = require('socket.io')
 const formatMessage = require('./utils/messages')
 const { format } = require('path')
 const { userJoin, getCurrentUser, userLeave, getRoomUsers } = require('./utils/users')
-const { colors } = require('./utils/colors')
 
 
 const app = express()
