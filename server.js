@@ -65,10 +65,8 @@ const new_web_socket = (socket) => {
 
    })
 
-
    socket.on('updateCanvas', (msg) => {
       const user = getCurrentUser(socket.id)
-
       io.to(user.room).emit('canvas', msg)
    })
 

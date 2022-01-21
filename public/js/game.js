@@ -1,4 +1,22 @@
+function generateUUID() { // Public Domain/MIT
+    var d = new Date().getTime();//Timestamp
+    var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16;//random number between 0 and 16
+        if(d > 0){//Use timestamp until depleted
+            r = (d + r)%16 | 0;
+            d = Math.floor(d/16);
+        } else {//Use microseconds since page-load if supported
+            r = (d2 + r)%16 | 0;
+            d2 = Math.floor(d2/16);
+        }
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+}
+
 var time = 60;
+
+var draw = true
 const player1 = {
     px: 4,
     py: 4,
@@ -6,7 +24,8 @@ const player1 = {
     tail: 5,
     xv: 0,
     yv: 0,
-    color: 'blue'
+    color: 'blue',
+    id : generateUUID()
 }
 const player2 = {
     px: 1,
@@ -32,29 +51,37 @@ window.onload = function () {
     canv = document.getElementById("gc");
     ctx = canv.getContext("2d");
     document.addEventListener("keydown", keyPush);
+    
 
-
+    ctx.clearRect(0, 0, canv.width, canv.height);
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canv.width, canv.height);
     var id = setInterval(x => {
-
-
-        socket.emit('updateCanvas', { player: player1, xv: xv1, yv: yv1 })
+        // game(player1)
+        socket.emit('updateCanvas',  player1)
         // game(player2, xv1, yv1)
 
-    }, 80);
+    }, 60);
 
 
 }
 socket.on("canvas", (data) => {
-    ctx.clearRect(0, 0, canv.width, canv.height);
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canv.width, canv.height);
-    game(player1, xv1, yv1)
-    game(data.player, data.xv, data.yv)
+    // if(data.id != player1.id){
+    if(draw){
+        console.log("drawn");
+        ctx.clearRect(0, 0, canv.width, canv.height);
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canv.width, canv.height);
+        game(player1)
+        game(data)
+    // }
+}
+draw = !draw;
 })
 
-function game(player, xv, yv) {
-    player.px += xv;
-    player.py += yv;
+function game(player) {
+    player.px += player.xv;
+    player.py += player.yv;
     if (player.px < 0) {
         player.px = tc - 1;
     }
@@ -94,16 +121,16 @@ function keyPush(evt) {
         evt.preventDefault()
     switch (evt.keyCode) {
         case 37:
-            xv1 = -1; yv1 = 0;
+            player1.xv = -1; player1.yv = 0;
             break;
         case 38:
-            xv1 = 0; yv1 = -1;
+            player1.xv = 0; player1.yv = -1;
             break;
         case 39:
-            xv1 = 1; yv1 = 0;
+            player1.xv = 1; player1.yv = 0;
             break;
         case 40:
-            xv1 = 0; yv1 = 1;
+            player1.xv = 0; player1.yv = 1;
             break;
     }
 }
