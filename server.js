@@ -4,8 +4,8 @@ const express = require('express')
 const socketio = require('socket.io')
 const formatMessage = require('./utils/messages')
 const { format } = require('path')
-const { userJoin, getCurrentUser, userLeave, getRoomUsers } = require('./utils/users')
-
+const { userJoin, getCurrentUser, userLeave, getRoomUsers , getUsersLength } = require('./utils/users')
+const { pointScored , getCoords } = require('./utils/game')
 
 const app = express()
 
@@ -41,6 +41,9 @@ const new_web_socket = (socket) => {
       })
       //Va afisa mesajul catre toti userii in afara ce cel care trimite
       socket.broadcast.to(user.room).emit('message', formatMessage('Admin', `${user.username} has joined the chat`))
+      if(getUsersLength() == 2) {
+         socket.emit('redPoint' , getCoords())
+      }
    })
 
 
@@ -65,10 +68,14 @@ const new_web_socket = (socket) => {
 
    })
 
-   socket.on('updateCanvas', (msg) => {
+   socket.on('updateCanvas', (player) => {
       const user = getCurrentUser(socket.id)
-      io.to(user.room).emit('canvas', msg)
+      io.to(user.room).emit('canvas', player)
+     
+      io.to(user.room ).emit('redPoint' , getCoords())
    })
+
+   socket.on('pointScored' , () => pointScored())
 
    const disconnect = () => {
 

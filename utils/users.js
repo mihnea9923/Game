@@ -2,7 +2,7 @@ const users = []
 
 
 
-
+const getUsersLength = () => users.length
 
 const userJoin = (id, username , room) => {
 
@@ -35,5 +35,6 @@ module.exports = {
     userJoin,
     getCurrentUser,
     userLeave,
-    getRoomUsers
+    getRoomUsers,
+    getUsersLength
 }

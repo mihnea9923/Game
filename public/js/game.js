@@ -13,7 +13,7 @@ function generateUUID() { // Public Domain/MIT
         return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
     });
 }
-
+var point = {}
 var time = 60;
 
 var draw = true
@@ -66,9 +66,7 @@ window.onload = function () {
 
 }
 socket.on("canvas", (data) => {
-    // if(data.id != player1.id){
     if(draw){
-        console.log("drawn");
         ctx.clearRect(0, 0, canv.width, canv.height);
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canv.width, canv.height);
@@ -77,6 +75,11 @@ socket.on("canvas", (data) => {
     // }
 }
 draw = !draw;
+})
+
+socket.on('redPoint' , (data) => {
+    point = data
+    
 })
 
 function game(player) {
@@ -107,14 +110,13 @@ function game(player) {
     while (player.trail.length > player.tail) {
         player.trail.shift();
     }
-
-    if (ax == player.px && ay == player.py) {
+    if (point.x == player.px && point.y == player.py) {
         player.tail++;
-        ax = Math.floor(Math.random() * tc);
-        ay = Math.floor(Math.random() * tc);
+        socket.emit('pointScored')
     }
     ctx.fillStyle = "red";
-    ctx.fillRect(ax * gs, ay * gs, gs - 2, gs - 2);
+    ctx.fillRect(point.x * gs, point.y * gs, gs - 2, gs - 2);
+   
 }
 function keyPush(evt) {
     if (evt.keyCode >= 37 && evt.keyCode <= 40)
