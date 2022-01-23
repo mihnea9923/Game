@@ -54,14 +54,21 @@ window.onload = function () {
     socket.on('setColor', color => {
         player1.color = color
     })
+    //start game counter
+    socket.on('startGame', () => {
+        setInterval(() => {
+            if (time > 0) {
+                time--
+                document.getElementById('time').innerHTML = "Time left: " + time + " s"
+            }
+        }, 1000)
+    })
 
     ctx.clearRect(0, 0, canv.width, canv.height);
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canv.width, canv.height);
     var id = setInterval(x => {
-        // game(player1)
         socket.emit('updateCanvas', player1)
-        // game(player2, xv1, yv1)
 
     }, 60);
 

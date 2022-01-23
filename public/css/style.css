@@ -170,6 +170,14 @@ a {
   color: #777;
 }
 
+.time {
+  font-size: 1.5rem;
+  color: #fff;
+  position: absolute;
+  right: 23%;
+  top: 0%;
+}
+
 .canvas {
   margin-left: 2rem;
 }
