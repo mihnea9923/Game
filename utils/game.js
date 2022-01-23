@@ -1,4 +1,6 @@
-const colors = ['red', 'lime']
+const { getUsersLength } = require('./users')
+
+const colors = ['orange', 'lime']
 tc = 30;
 pointX = pointY = 15
 const pointScored = () => {
@@ -10,7 +12,11 @@ const getCoords = () => {
     return { x: pointX, y: pointY }
 }
 
+const getColor = () => {
+    return colors[getUsersLength()]
+}
 module.exports = {
     pointScored,
-    getCoords
+    getCoords,
+    getColor
 }

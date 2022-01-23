@@ -1,14 +1,14 @@
 function generateUUID() { // Public Domain/MIT
     var d = new Date().getTime();//Timestamp
-    var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now() * 1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16;//random number between 0 and 16
-        if(d > 0){//Use timestamp until depleted
-            r = (d + r)%16 | 0;
-            d = Math.floor(d/16);
+        if (d > 0) {//Use timestamp until depleted
+            r = (d + r) % 16 | 0;
+            d = Math.floor(d / 16);
         } else {//Use microseconds since page-load if supported
-            r = (d2 + r)%16 | 0;
-            d2 = Math.floor(d2/16);
+            r = (d2 + r) % 16 | 0;
+            d2 = Math.floor(d2 / 16);
         }
         return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
     });
@@ -25,7 +25,7 @@ const player1 = {
     xv: 0,
     yv: 0,
     color: 'blue',
-    id : generateUUID()
+    id: generateUUID()
 }
 const player2 = {
     px: 1,
@@ -51,14 +51,16 @@ window.onload = function () {
     canv = document.getElementById("gc");
     ctx = canv.getContext("2d");
     document.addEventListener("keydown", keyPush);
-    
+    socket.on('setColor', color => {
+        player1.color = color
+    })
 
     ctx.clearRect(0, 0, canv.width, canv.height);
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canv.width, canv.height);
     var id = setInterval(x => {
         // game(player1)
-        socket.emit('updateCanvas',  player1)
+        socket.emit('updateCanvas', player1)
         // game(player2, xv1, yv1)
 
     }, 60);
@@ -66,21 +68,23 @@ window.onload = function () {
 
 }
 socket.on("canvas", (data) => {
-    if(draw){
+    if (draw) {
         ctx.clearRect(0, 0, canv.width, canv.height);
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canv.width, canv.height);
         game(player1)
         game(data)
-    // }
-}
-draw = !draw;
+    }
+    draw = !draw;
 })
 
-socket.on('redPoint' , (data) => {
+
+socket.on('redPoint', (data) => {
     point = data
-    
+
 })
+
+
 
 function game(player) {
     player.px += player.xv;
@@ -116,7 +120,7 @@ function game(player) {
     }
     ctx.fillStyle = "red";
     ctx.fillRect(point.x * gs, point.y * gs, gs - 2, gs - 2);
-   
+
 }
 function keyPush(evt) {
     if (evt.keyCode >= 37 && evt.keyCode <= 40)
