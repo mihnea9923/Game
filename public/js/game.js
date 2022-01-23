@@ -1,22 +1,9 @@
-function generateUUID() { // Public Domain/MIT
-    var d = new Date().getTime();//Timestamp
-    var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now() * 1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16;//random number between 0 and 16
-        if (d > 0) {//Use timestamp until depleted
-            r = (d + r) % 16 | 0;
-            d = Math.floor(d / 16);
-        } else {//Use microseconds since page-load if supported
-            r = (d2 + r) % 16 | 0;
-            d2 = Math.floor(d2 / 16);
-        }
-        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
-}
+
 var point = {}
 var time = 60;
-
+var canPlay = false
 var draw = true
+var gameFinishedText = ''
 const player1 = {
     px: 4,
     py: 4,
@@ -25,28 +12,10 @@ const player1 = {
     xv: 0,
     yv: 0,
     color: 'blue',
-    id: generateUUID()
+    id: Math.random()
 }
-const player2 = {
-    px: 1,
-    py: 1,
-    trail: [],
-    tail: 5,
-    xv: 0,
-    yv: 0,
-    color: 'lime'
-}
-
-px1 = py1 = 4;
-px2 = 1, py2 = 4;
 gs = 20;
 tc = 30;
-ax = ay = 15;
-xv1 = yv1 = 0;
-trail1 = [];
-trail2 = []
-tail1 = 5;
-tail2 = 5;
 window.onload = function () {
     canv = document.getElementById("gc");
     ctx = canv.getContext("2d");
@@ -56,10 +25,19 @@ window.onload = function () {
     })
     //start game counter
     socket.on('startGame', () => {
-        setInterval(() => {
-            if (time > 0) {
+        time = 60;
+        resetPlayer()
+        var timeInterval = setInterval(() => {
+            if (time > 0 && canPlay) {
                 time--
                 document.getElementById('time').innerHTML = "Time left: " + time + " s"
+            }
+            else {
+                document.getElementById('button').style.display = 'inline-block'
+                document.getElementById('time').innerHTML = gameFinishedText
+                canPlay = false
+                clearCanvas()
+                clearInterval(timeInterval)
             }
         }, 1000)
     })
@@ -68,30 +46,64 @@ window.onload = function () {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canv.width, canv.height);
     var id = setInterval(x => {
-        socket.emit('updateCanvas', player1)
+        if (canPlay) {
+            socket.emit('updateCanvas', player1)
+        }
 
     }, 60);
 
 
 }
 socket.on("canvas", (data) => {
-    if (draw) {
+    if (draw && canPlay) {
         ctx.clearRect(0, 0, canv.width, canv.height);
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canv.width, canv.height);
         game(player1)
         game(data)
+        if (player1.id != data.id) {
+            console.log(player1.id, data.id);
+            if (player1.trail.length > data.trail.length) {
+                gameFinishedText = "You won"
+            }
+            else if (player1.trail.length < data.trail.length) {
+                gameFinishedText = "You lost"
+            }
+            else {
+                gameFinishedText = "Draw round"
+            }
+        }
     }
     draw = !draw;
 })
 
+socket.on('setCanPlay', () => canPlay = true)
 
 socket.on('redPoint', (data) => {
     point = data
 
 })
 
+function play() {
+    socket.emit('readyToPlay')
+    document.getElementById('button').style.display = 'none'
+}
 
+function clearCanvas() {
+    ctx.clearRect(0, 0, canv.width, canv.height);
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canv.width, canv.height);
+
+}
+
+function resetPlayer() {
+    player1.px = 4
+    player1.py = 4
+    player1.trail = []
+    player1.tail = 5
+    player1.xv = 0
+    player1.yv = 0
+}
 
 function game(player) {
     player.px += player.xv;
@@ -127,7 +139,6 @@ function game(player) {
     }
     ctx.fillStyle = "red";
     ctx.fillRect(point.x * gs, point.y * gs, gs - 2, gs - 2);
-
 }
 function keyPush(evt) {
     if (evt.keyCode >= 37 && evt.keyCode <= 40)

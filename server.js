@@ -5,7 +5,7 @@ const socketio = require('socket.io')
 const formatMessage = require('./utils/messages')
 const { format } = require('path')
 const { userJoin, getCurrentUser, userLeave, getRoomUsers, getUsersLength } = require('./utils/users')
-const { pointScored, getCoords, getColor } = require('./utils/game')
+const { pointScored, getCoords, getColor, playerReady, canPlay, playerOut, resetGame } = require('./utils/game')
 
 const app = express()
 
@@ -50,13 +50,15 @@ const new_web_socket = (socket) => {
 
    console.log('new ws connect')
 
-
-
-
-   //catre toti
-   /* io.emit() */
-
-
+   socket.on('readyToPlay', () => {
+      playerReady()
+      if (canPlay()) {
+         const user = getCurrentUser(socket.id)
+         io.to(user.room).emit('setCanPlay')
+         io.to(user.room).emit('startGame')
+         resetGame()
+      }
+   })
 
    //chat message de la client
    socket.on('chatMessage', (msg) => {
@@ -88,6 +90,7 @@ const new_web_socket = (socket) => {
          })
          io.emit('message', formatMessage('Admin', `${user.username} has left the chat`))
       }
+      playerOut()
    }
 
    //cand se deconecteaza
