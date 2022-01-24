@@ -55,7 +55,8 @@ window.onload = function () {
 
 }
 socket.on("canvas", (data) => {
-    if (draw && canPlay) {
+    console.log(player1.id, data.id)
+    if (player1.id != data.id && canPlay) {
         ctx.clearRect(0, 0, canv.width, canv.height);
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canv.width, canv.height);
