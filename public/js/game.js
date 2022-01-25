@@ -1,7 +1,8 @@
-
+var background;
 var point = {}
 var time = 60;
 var canPlay = false
+var radius = 7
 var draw = true
 var gameFinishedText = ''
 const player1 = {
@@ -45,6 +46,12 @@ window.onload = function () {
     ctx.clearRect(0, 0, canv.width, canv.height);
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canv.width, canv.height);
+    background = new Image();
+    background.src = "https://cutewallpaper.org/21/slitherio-backgrounds/Slither.io-like-HD-animated-background-127.jpg";
+    // Make sure the image is loaded first otherwise nothing will draw.
+    background.onload = function () {
+        ctx.drawImage(background, 0, 0);
+    }
     var id = setInterval(x => {
         if (canPlay) {
             socket.emit('updateCanvas', player1)
@@ -60,10 +67,10 @@ socket.on("canvas", (data) => {
         ctx.clearRect(0, 0, canv.width, canv.height);
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canv.width, canv.height);
+        ctx.drawImage(background, 0, 0);
         game(player1)
         game(data)
         if (player1.id != data.id) {
-            console.log(player1.id, data.id);
             if (player1.trail.length > data.trail.length) {
                 gameFinishedText = "You won"
             }
@@ -97,6 +104,9 @@ function clearCanvas() {
 
 }
 
+
+
+
 function resetPlayer() {
     player1.px = 4
     player1.py = 4
@@ -125,7 +135,7 @@ function game(player) {
 
     ctx.fillStyle = player.color;
     for (var i = 0; i < player.trail.length; i++) {
-        ctx.fillRect(player.trail[i].x * gs, player.trail[i].y * gs, gs - 2, gs - 2);
+        ctx.fillRect(player.trail[i].x * gs, player.trail[i].y * gs, gs, gs);
         if (player.trail[i].x == player.px && player.trail[i].y == player.py) {
             player.tail = 5;
         }
@@ -139,7 +149,7 @@ function game(player) {
         socket.emit('pointScored')
     }
     ctx.fillStyle = "red";
-    ctx.fillRect(point.x * gs, point.y * gs, gs - 2, gs - 2);
+    ctx.fillRect(point.x * gs, point.y * gs, gs, gs);
 }
 function keyPush(evt) {
     if (evt.keyCode >= 37 && evt.keyCode <= 40)

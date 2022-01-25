@@ -193,6 +193,21 @@ a {
 
 .canvas {
   margin-left: 2rem;
+  border: 10px solid;
+  border-image-slice: 1;
+  border-width: 5px;
+  border-image-source: linear-gradient(to left, #743ad5, #d53a9d);
+  border-radius: 8px;
+}
+
+.canvas:before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  z-index: -1;
+  margin: -border; /* !importanté */
+  border-radius: inherit; /* !importanté */
+  background: linear-gradient(to right, red, orange);
 }
 
 .chat-form-container {
