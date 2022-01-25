@@ -89,6 +89,10 @@ a {
   overflow: hidden;
 }
 
+.chat-container> :first-child {
+  width: calc(100% - 600px);
+}
+
 .btn-leave {
   display: grid;
   margin: auto;
@@ -171,24 +175,20 @@ a {
 }
 
 .time {
-  font-size: 1.5rem;
+  font-size: 2rem;
   color: #fff;
-  position: absolute;
-  right: 23%;
-  top: 0%;
+
 }
 
 .play {
-  font-size: 1rem;
+  font-size: 1.5rem;
   cursor: pointer;
   color: #fff;
   background-color: #ff7373;
   padding: .5rem 1rem;
   border-radius: 8px;
-  position: absolute;
-  right: 18%;
-  top: 0%;
   display: inline-block;
+  margin-left: .5rem;
 }
 
 .canvas {
@@ -198,15 +198,22 @@ a {
   border-width: 5px;
   border-image-source: linear-gradient(to left, #743ad5, #d53a9d);
   border-radius: 8px;
+  width: 600px;
+  height: 600px;
 }
 
 .canvas:before {
   content: '';
   position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: -1;
-  margin: -border; /* !importanté */
-  border-radius: inherit; /* !importanté */
+  margin: -border;
+  /* !importanté */
+  border-radius: inherit;
+  /* !importanté */
   background: linear-gradient(to right, red, orange);
 }
 
@@ -308,6 +315,13 @@ a {
   background-color: #f7f7f7;
   position: relative;
   top: 0px;
+
+}
+
+.game-div {
+  display: flex;
+  align-items: center;
+  margin-left: calc(100% - 600px);
 
 }
 
